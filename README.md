@@ -30,4 +30,4 @@ into single response, transformers, etc.
 - MLOps Prod Documentation [here](examples/prod-access/README.md)
 
 #### Maintainers
-Riley Hun, David Meyer, Nivi Mukka
+Riley Hun
