@@ -1,0 +1,20 @@
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: iris-model
+  namespace: seldon
+spec:
+  name: iris-model
+  predictors:
+  - graph:
+      children: []
+      endpoint:
+        type: REST
+      implementation: SKLEARN_SERVER
+      modelUri: gs://rihun_storage/sklearn/iris/IrisClassifier.pkl
+      name: classifier
+      type: MODEL
+      logger:
+        mode: all
+    name: logging
+    replicas: 1

@@ -1,0 +1,5 @@
+type: "GCS"
+config:
+  bucket: "PROJECT_ID-thanos"
+  service_account: |-
+    GCLOUD_SERVICE_KEY

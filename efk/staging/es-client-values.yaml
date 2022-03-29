@@ -1,0 +1,64 @@
+clusterName: "es"
+nodeGroup: "client"
+
+roles:
+  master: "false"
+  ingest: "false"
+  data: "false"
+  ml: "false"
+  remote_cluster_client: "true"
+
+replicas: 2
+
+volumeClaimTemplate:
+  accessModes: [ "ReadWriteOnce" ]
+  storageClassName: "standard"
+  resources:
+    requests:
+      storage: 2Gi
+
+protocol: https
+
+extraEnvs:
+  - name: ELASTIC_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elastic-credentials
+        key: pwd
+  - name: ELASTIC_USERNAME
+    value: elastic
+  - name: SSL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elastic-ssl
+        key: password
+
+secretMounts:
+  - name: elastic-certs
+    path: "/usr/share/elasticsearch/config/certs"
+    secretName: elastic-certificates
+
+# Default Resource Limits
+#resources:
+#  requests:
+#    cpu: "1000m"
+#    memory: "1Gi"
+#  limits:
+#    cpu: "1000m"
+#    memory: "1Gi"
+# XPACK enable
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+    xpack.security.transport.ssl.enabled: true
+    xpack.security.transport.ssl.verification_mode: certificate
+    xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    xpack.security.http.ssl.enabled: true
+    xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    xpack.security.transport.ssl.keystore.password: ${SSL_PASSWORD}
+    xpack.security.transport.ssl.truststore.password: ${SSL_PASSWORD}
+    xpack.security.http.ssl.keystore.password: ${SSL_PASSWORD}
+    xpack.security.http.ssl.truststore.password: ${SSL_PASSWORD}
+

@@ -1,0 +1,73 @@
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: spt-model
+  namespace: ai-for-good
+spec:
+  name: spt-model
+  annotations:
+    seldon.io/rest-timeout: "100000"
+    seldon.io/grpc-timeout: "100000"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/prometheus"
+  predictors:
+    - graph:
+        children: []
+        endpoint:
+          type: REST
+        name: spt-classifier
+        type: MODEL
+        logger:
+          mode: all
+      name: spt-bert-model
+      traffic: 60
+      componentSpecs:
+      - hpaSpec:
+          maxReplicas: 3
+          metrics:
+            - resource:
+                name: cpu
+                targetAverageUtilization: 30
+              type: Resource
+          minReplicas: 1
+        spec:
+          containers:
+          - image: gcr.io/${PROJECT_ID}/${BERT_IMAGE_NAME}:${BERT_IMAGE_TAG}
+            name: spt-classifier
+            resources:
+              requests:
+                memory: "5Gi"
+                cpu: "2"
+              limits:
+                memory: "10Gi"
+                cpu: "3"
+    - graph:
+        children: []
+        endpoint:
+          type: REST
+        name: spt-classifier
+        type: MODEL
+        logger:
+          mode: all
+      name: spt-rule-based-model
+      traffic: 40
+      componentSpecs:
+      - hpaSpec:
+          maxReplicas: 2
+          metrics:
+            - resource:
+                name: cpu
+                targetAverageUtilization: 10
+              type: Resource
+          minReplicas: 1
+        spec:
+          containers:
+            - image: gcr.io/${PROJECT_ID}/${RULE_BASED_IMAGE_NAME}:${RULE_BASED_IMAGE_TAG}
+              name: spt-classifier
+              resources:
+                requests:
+                  memory: "250Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "500Mi"
+                  cpu: "500m"

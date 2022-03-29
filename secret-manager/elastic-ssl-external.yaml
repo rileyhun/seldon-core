@@ -1,0 +1,21 @@
+apiVersion: kubernetes-client.io/v1
+kind: ExternalSecret
+metadata:
+  name: elastic-ssl
+spec:
+  backendType: gcpSecretsManager
+  # Project to use for GCP Secrets Manager (use the service account project by default)
+  projectId: ${PROJECT_ID}
+  data:
+      # Key in GCP Secrets Manager (without project and version)
+    - key: elastic-ssl
+      name: password
+      property: elastic-ssl-password
+      version: latest
+      isBinary: false
+
+    - key: elastic-ssl
+      name: encryptionkey
+      property: kibana-encryption-key
+      version: latest
+      isBinary: false

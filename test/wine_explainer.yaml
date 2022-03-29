@@ -1,0 +1,25 @@
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: wine
+  namespace: ai-for-good
+spec:
+  annotations:
+    seldon.io/rest-timeout: "100000"
+  predictors:
+  - graph:
+      serviceAccountName: seldon-core-user
+      children: []
+      implementation: SKLEARN_SERVER
+      modelUri: gs://rihun/sklearn/wine/model-py36-0.23.2
+      name: classifier
+      parameters:
+        - name: method
+          type: STRING
+          value: decision_function
+    explainer:
+      type: KernelShap
+      modelUri: gs://rihun/sklearn/wine/kernel_shap_py36_alibi_0.5.5
+      serviceAccountName: seldon-core-user
+    name: wine-model
+    replicas: 1

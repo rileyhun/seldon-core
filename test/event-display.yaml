@@ -1,0 +1,44 @@
+# event-display app deploment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-display
+  namespace: ai-for-good
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: event-display
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: helloworld-python
+          image: gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display
+---
+# Service that exposes event-display app.
+# This will be the subscriber for the Trigger
+kind: Service
+apiVersion: v1
+metadata:
+  name: event-display
+  namespace: ai-for-good
+spec:
+  selector:
+    app: event-display
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+# Trigger to send events to service above
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: event-display
+  namespace: ai-for-good
+spec:
+  broker: default
+  subscriber:
+    uri: http://event-display.ai-for-good.svc.cluster.local:80

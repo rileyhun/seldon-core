@@ -1,0 +1,24 @@
+existingObjstoreSecret: thanos-objstore-secret
+querier:
+  stores:
+    - 172.30.192.46:10901
+bucketweb:
+  enabled: true
+compactor:
+  enabled: true
+  retentionResolutionRaw: 30d  # Full resolution
+  retentionResolution5m: 60d   # 1 data point every 5m
+  retentionResolution1h: 10y   # 1 data point per hour
+storegateway:
+  enabled: true
+ruler:
+  enabled: true
+  alertmanagers:
+    - http://prometheus-operator-kube-p-alertmanager.monitoring.svc.cluster.local:9093
+  config: |-
+    groups:
+      - name: "metamonitoring"
+        rules:
+          - alert: "PrometheusDown"
+            expr: absent(up{prometheus="monitoring/prometheus-operator-kube-p-operator"})
+

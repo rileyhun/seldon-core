@@ -1,0 +1,21 @@
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: movie
+  namespace: ai-for-good
+spec:
+  name: movie
+  annotations:
+    seldon.io/rest-timeout: "100000"
+  predictors:
+  - graph:
+      children: []
+      implementation: SKLEARN_SERVER
+      modelUri: gs://seldon-models/sklearn/moviesentiment
+      name: classifier
+      serviceAccountName: seldon-core-user
+    explainer:
+      type: AnchorText
+      serviceAccountName: seldon-core-user
+    name: default
+    replicas: 1

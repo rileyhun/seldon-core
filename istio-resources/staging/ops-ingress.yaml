@@ -1,0 +1,11 @@
+apiVersion: "extensions/v1beta1"
+kind: "Ingress"
+metadata:
+  name: "ops-ingress"
+  namespace: "istio-system"
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "ops-istio-ingress-static-ip"
+spec:
+  backend:
+    serviceName: "istio-ops-ingressgateway"
+    servicePort: 80

@@ -1,0 +1,52 @@
+apiVersion: machinelearning.seldon.io/v1alpha2
+kind: SeldonDeployment
+metadata:
+  name: iris-demo-model
+  namespace: seldon
+spec:
+  name: iris-demo-model
+  predictors:
+    - componentSpecs:
+        - spec:
+            containers:
+              - name: classifier
+                image: gcr.io/dao-aa-poc-uyim/iris_classifier:0.0.1
+                env:
+                  - name: MODEL_METADATA
+                    value: |
+                      ---
+                      name: iris-model
+                      versions: [ 0.1 ]
+                      platform: seldon
+                      inputs:
+                      - messagetype: ndarray
+                        schema:
+                          names: [a, b, c, d]
+                          shape: [4]
+                      outputs:
+                      - messagetype: ndarray
+                        schema:
+                          shape: [1]
+                      custom:
+                        author: seldon-dev
+                        extra: information
+                volumeMounts:
+                  - mountPath: /bentoml
+                    name: bentoml-volume
+                ports:
+                  - containerPort: 5000
+                    name: http
+                    protocol: TCP
+            volumes:
+              - name: bentoml-volume
+                emptyDir: {}
+      graph:
+        children: []
+        endpoint:
+          type: REST
+        name: classifier
+        type: MODEL
+        logger:
+          mode: all
+      name: model
+      replicas: 1

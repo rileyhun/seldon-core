@@ -1,0 +1,14 @@
+apiVersion: "extensions/v1beta1"
+kind: "Ingress"
+metadata:
+  name: "primary-ingress"
+  namespace: "istio-system"
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "primary-istio-ingress-static-ip"
+    ingress.gcp.kubernetes.io/pre-shared-cert: "mlops-main-cert"
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  backend:
+    serviceName: "istio-ingressgateway"
+    servicePort: 443
+

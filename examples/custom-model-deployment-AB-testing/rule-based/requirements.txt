@@ -1,0 +1,4 @@
+spacy==3.0.3
+numpy==1.18.5
+seldon-core==1.6.0
+Flask==1.1.2

@@ -1,0 +1,60 @@
+elasticsearchHosts: "https://es-client.logging.svc.cluster.local:9200"
+
+replicas: 1
+
+imageTag: "7.12.0"
+imagePullPolicy: "Always"
+
+extraEnvs:
+  - name: 'ELASTICSEARCH_USERNAME'
+    value: elastic
+  - name: 'ELASTICSEARCH_PASSWORD'
+    valueFrom:
+      secretKeyRef:
+        name: elastic-credentials
+        key: pwd
+  - name: 'KIBANA_ENCRYPTION_KEY'
+    valueFrom:
+      secretKeyRef:
+        name: elastic-ssl
+        key: encryptionkey
+#  - name: 'SERVER_BASEPATH'
+#    value: "/kibana"
+
+secretMounts:
+  - path: "/usr/share/kibana/config/certs"
+    secretName: elastic-ca
+    name: elastic-ca-pem
+
+#    TO DO:
+#    server.ssl:
+#      enabled: true
+#      key: /usr/share/kibana/config/certs/elasticsearch-ca.pem
+#      certificate: /usr/share/kibana/config/certs/elasticsearch-ca.pem
+#    xpack.security.encryptionKey: ${KIBANA_ENCRYPTION_KEY}
+#    xpack.security.session.idleTimeout: "1h"
+#    xpack.security.session.lifespan: "30d"
+
+kibanaConfig:
+  kibana.yml: |
+    elasticsearch.ssl:
+      certificateAuthorities: /usr/share/kibana/config/certs/elasticsearch-ca.pem
+      verificationMode: certificate
+
+#protocol: https
+#
+#service:
+#  type: ClusterIP
+#  loadBalancerIP: ""
+#  port: 5601
+#  nodePort: ""
+#  labels: {}
+#  annotations: {}
+#    # cloud.google.com/load-balancer-type: "Internal"
+#    # service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+#    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+#    # service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
+#    # service.beta.kubernetes.io/cce-load-balancer-internal-vpc: "true"
+#  loadBalancerSourceRanges: []
+#    # 0.0.0.0/0
+#  httpPortName: http

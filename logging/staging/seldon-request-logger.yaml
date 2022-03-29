@@ -1,0 +1,28 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: seldon-request-logger
+  metadata:
+    labels:
+    fluentd: "true"
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      serviceAccountName: "secretsinvoker"
+      containers:
+      - image: gcr.io/${PROJECT_ID}/seldon-request-logger:0.1.0
+        imagePullPolicy: Always
+        env:
+          - name: ELASTICSEARCH_HOST
+            value: "es-client.logging.svc.cluster.local"
+          - name: ELASTICSEARCH_PORT
+            value: "9200"
+          - name: ELASTICSEARCH_PROTOCOL
+            value: "https"
+          - name: ELASTICSEARCH_USER
+            value: "elastic"
+          - name: ELASTICSEARCH_PASS
+            value: "sm://${PROJECT_ID}/seldon-elastic-secret"

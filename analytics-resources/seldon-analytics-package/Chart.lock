@@ -1,0 +1,9 @@
+dependencies:
+- name: grafana
+  repository: https://charts.helm.sh/stable
+  version: ~5.1.4
+- name: prometheus
+  repository: https://charts.helm.sh/stable
+  version: ~11.5.0
+digest: sha256:32f665a9dc1515fd42feaabfd243e5b382e8c8cdae5282157c34c86364a39df8
+generated: "2021-04-08T19:21:34.261279-07:00"

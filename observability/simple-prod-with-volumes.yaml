@@ -1,0 +1,25 @@
+# setup an elasticsearch with `make es`
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: simple-prod
+spec:
+  strategy: production
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: https://172.30.192.36:9200
+        tls:
+          ca: /es/certificates/ca.crt
+        num-shards: 1
+        num-replicas: 0
+    secretName: jaeger-secret
+  volumeMounts:
+    - name: certificates
+      mountPath: /es/certificates/
+      readOnly: true
+  volumes:
+    - name: certificates
+      secret:
+        secretName: gke-eck-es-http-certs-public

@@ -1,0 +1,50 @@
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "RequestAuthentication"
+metadata:
+  name: "ai-for-good-spt-service-jwt-policy"
+  namespace: ai-for-good
+spec:
+  selector:
+    matchLabels:
+        seldon-deployment-id: spt-model
+  jwtRules:
+  - issuer: https://accounts.google.com
+    audiences:
+      - "${PROJECT_ID}"
+    jwksUri: https://www.googleapis.com/oauth2/v3/certs
+    forwardOriginalToken: true
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "AuthorizationPolicy"
+metadata:
+  name: "ai-for-good-spt-service-authz-policy"
+  namespace: ai-for-good
+spec:
+  selector:
+    matchLabels:
+      seldon-deployment-id: spt-model
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods: ["POST"]
+    when:
+      - key: request.auth.claims[aud]
+        values:
+          - "${PROJECT_ID}"
+      - key: request.auth.claims[email]
+        values:
+          - "seldon-core-user@${PROJECT_ID}.iam.gserviceaccount.com"
+      - key: request.auth.claims[iss]
+        values:
+          - "https://accounts.google.com"
+#  - from:
+#    - source:
+#        namespaces: ["monitoring", "ai-for-good"]
+  - to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/prometheus"]
+        ports: ["6000", "8000", "6001"]
+

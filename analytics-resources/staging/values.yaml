@@ -1,0 +1,57 @@
+grafana:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 220Mi
+    requests:
+      cpu: 50m
+      memory: 110Mi
+  env:
+    GF_SECURITY_ADMIN_USER: "admin"
+    GF_SECURITY_ADMIN_PASSWORD: "REPLACE_PASSWORD"
+  persistence:
+    enabled: true
+    annotations:
+      volume.beta.kubernetes.io/storage-class: "fast"
+    type: pvc
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+    finalizers:
+      - kubernetes.io/pvc-protection
+prometheus:
+  alertmanager:
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
+  nodeExporter:
+    service:
+      hostPort: 9200
+      servicePort: 9200
+    resources:
+      limits:
+        cpu: 200m
+        memory: 220Mi
+      requests:
+        cpu: 50m
+        memory: 110Mi
+  server:
+    retention: "90d"
+    extraArgs:
+      storage.tsdb.retention.size: 27GB
+    persistentVolume:
+      enabled: true
+      existingClaim: ""
+      mountPath: /data
+      size: 32Gi
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 600m
+        memory: 1Gi

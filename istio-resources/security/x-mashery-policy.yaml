@@ -1,0 +1,27 @@
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "AuthorizationPolicy"
+metadata:
+  name: "mashery-authz-policy"
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods: ["POST"]
+    when:
+      - key: request.headers[x-mashery-handshake]
+        values: ["*"]
+#  - from:
+#    - source:
+#        namespaces: ["monitoring", "ai-for-good"]
+#  - to:
+#    - operation:
+#        methods: ["GET"]
+#        paths: ["/prometheus"]
+#        ports: ["6000", "8000", "6001"]
+

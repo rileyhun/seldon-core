@@ -1,0 +1,9 @@
+tensorflow-hub==0.9.0
+tensorflow-cpu==2.3.2
+spacy==3.0.3
+seldon-core==1.6.0
+bert-for-tf2==0.14.9
+bert-tensorflow==1.0.4
+numpy==1.18.5
+sentencepiece==0.1.95
+google-cloud-storage==1.29.0

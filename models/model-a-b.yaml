@@ -1,0 +1,112 @@
+---
+apiVersion: machinelearning.seldon.io/v1alpha2
+kind: SeldonDeployment
+metadata:
+  name: wines-classifier
+  namespace: ai-for-good
+spec:
+  name: wines-classifier
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/prometheus"
+#    prometheus.io/port: "8000"
+  predictors:
+  - graph:
+      children: []
+      implementation: MLFLOW_SERVER
+      modelUri: gs://mlflow-seldon/mlflow/model-a
+      name: wines-classifier
+      logger:
+          mode: all
+    name: model-a
+    traffic: 50
+    componentSpecs:
+    - hpaSpec:
+        maxReplicas: 3
+        metrics:
+        - resource:
+            name: cpu
+            targetAverageUtilization: 10
+          type: Resource
+        minReplicas: 1
+      spec:
+        # We are setting high failureThreshold as installing conda dependencies
+        # can take long time and we want to avoid k8s killing the container prematurely
+        containers:
+        - name: wines-classifier
+          image: seldonio/mlflowserver:1.6.0
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: '3'
+            limits:
+              memory: "6Gi"
+              cpu: "4"
+          livenessProbe:
+            initialDelaySeconds: 60
+            failureThreshold: 100
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              path: /health/ping
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            initialDelaySeconds: 60
+            failureThreshold: 100
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              path: /health/ping
+              port: http
+              scheme: HTTP
+            
+  - graph:
+      children: []
+      implementation: MLFLOW_SERVER
+      modelUri: gs://mlflow-seldon/mlflow/model-b
+      name: wines-classifier
+      logger:
+          mode: all
+    name: model-b
+    traffic: 50
+    componentSpecs:
+    - hpaSpec:
+        maxReplicas: 3
+        metrics:
+        - resource:
+            name: cpu
+            targetAverageUtilization: 10
+          type: Resource
+        minReplicas: 1
+      spec:
+        # We are setting high failureThreshold as installing conda dependencies
+        # can take long time and we want to avoid k8s killing the container prematurely
+        containers:
+        - name: wines-classifier
+          image: seldonio/mlflowserver:1.6.0
+          resources:
+            requests:
+                memory: "4Gi"
+                cpu: '3'
+            limits:
+                memory: "6Gi"
+                cpu: "4"
+          livenessProbe:
+            initialDelaySeconds: 60
+            failureThreshold: 100
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              path: /health/ping
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            initialDelaySeconds: 60
+            failureThreshold: 100
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              path: /health/ping
+              port: http
+              scheme: HTTP

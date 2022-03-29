@@ -1,0 +1,38 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: seldon-apps-monitor
+  labels:
+    env: prod
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+    - ai-for-good
+  selector:
+    matchExpressions:
+      - key: seldon-app
+        operator: Exists
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 5s
+    path: /prometheus
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: seldon-monitor
+  labels:
+    env: prod
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+    - ai-for-good
+  selector:
+    matchLabels:
+      app: seldon
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 5s
